@@ -349,35 +349,100 @@ function generarPDF(){
 
   let y = 15;
 
-  doc.setFontSize(16);
-  doc.text('IRUÑA VOLKSWAGEN', 14, y);
+  // Encabezado
+  doc.setFontSize(18);
+  doc.setFont(undefined, 'bold');
+  doc.text('IRUÑA VOLKSWAGEN', 105, y, { align: 'center' });
   y += 8;
 
+  doc.setFontSize(12);
+  doc.setFont(undefined, 'normal');
+  doc.text('Cotización – Venta Directa', 105, y, { align: 'center' });
+  y += 6;
+
+  const fecha = new Date().toLocaleDateString('es-AR');
+  doc.setFontSize(9);
+  doc.text('Fecha: ' + fecha, 105, y, { align: 'center' });
+  y += 6;
+
+  doc.line(14, y, 196, y);
+  y += 8;
+
+  // VEHÍCULO
+  doc.setFontSize(12);
+  doc.setFont(undefined, 'bold');
+  doc.text('VEHÍCULO', 14, y);
+  y += 6;
+
   doc.setFontSize(11);
-  doc.text('Cotización – Venta Directa', 14, y);
-  y += 10;
+  doc.setFont(undefined, 'normal');
+  doc.text('Modelo: ' + selModelo.value.toUpperCase(), 14, y); y += 6;
+  doc.text('Versión: ' + selVersion.options[selVersion.selectedIndex].text, 14, y); y += 6;
+  doc.text('Precio unidad: $' + Number(inpPrecio.value).toLocaleString(), 14, y);
+  y += 8;
 
-  doc.text('Vehículo:', 14, y);
-  y += 6;
-  doc.text('Modelo: ' + selModelo.value.toUpperCase(), 14, y);
-  y += 6;
-  doc.text('Versión: ' + selVersion.options[selVersion.selectedIndex].text, 14, y);
-  y += 10;
+  doc.line(14, y, 196, y);
+  y += 8;
 
-  doc.text('Detalle de gastos:', 14, y);
+  // FINANCIACIÓN
+  doc.setFont(undefined, 'bold');
+  doc.text('FINANCIACIÓN', 14, y);
   y += 6;
+
+  doc.setFont(undefined, 'normal');
+  doc.text(
+    'Capital financiado: $' + Number(inpMonto.value).toLocaleString(),
+    18,
+    y
+  );
+  y += 6;
+
+  doc.text(
+    'Valor de la cuota: ' + cuotaBig.textContent,
+    18,
+    y
+  );
+  y += 8;
+
+  doc.line(14, y, 196, y);
+  y += 8;
+
+  // DETALLE DE GASTOS
+  doc.setFont(undefined, 'bold');
+  doc.text('DETALLE DE GASTOS', 14, y);
+  y += 6;
+
+  doc.setFont(undefined, 'normal');
   outDetails.innerText.split('\n').forEach(linea => {
     doc.text(linea, 18, y);
     y += 6;
   });
 
-  y += 6;
-  doc.setFontSize(14);
-  doc.text(outTotal.textContent, 14, y);
+  y += 4;
+  doc.line(14, y, 196, y);
+  y += 8;
 
-  y += 12;
+  // TOTAL
+  doc.setFontSize(14);
+  doc.setFont(undefined, 'bold');
+  doc.text('ANTICIPO TOTAL', 14, y);
+  y += 8;
+
+  doc.setFontSize(18);
+  doc.text(outTotal.textContent.replace('ANTICIPO TOTAL: ', ''), 14, y);
+  y += 10;
+
+  doc.line(14, y, 196, y);
+  y += 8;
+
+  // Footer
   doc.setFontSize(9);
-  doc.text('Cotización sujeta a condiciones comerciales vigentes.', 14, y);
+  doc.setFont(undefined, 'normal');
+  doc.text(
+    'Cotización sujeta a condiciones comerciales vigentes. Valores estimados.',
+    14,
+    y
+  );
 
   doc.save('Cotizacion_Iruna_VW.pdf');
 }
