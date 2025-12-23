@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cotizador VW Pro - v4 FIX</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--vw-blue:#001e50;--vw-celeste:#0099da;--bg:#f4f7fb;--card:#ffffff;--muted:#6b7280;--radius:12px}
+*{box-sizing:border-box}
+body{font-family:Inter,Segoe UI,Roboto,Arial;background:var(--bg);margin:0;padding:20px;color:#071033}
+.header{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,var(--vw-blue),#003a7a);color:white;padding:14px;border-radius:12px;box-shadow:0 8px 24px rgba(0,30,80,0.12)}
+.logo{width:48px;height:48px;border-radius:10px;background:white;display:flex;align-items:center;justify-content:center;color:var(--vw-blue);font-weight:800;font-size:18px}
+.h-title{font-size:18px;margin:0;font-weight:600}
+.nav-actions{margin-left:auto;display:flex;gap:8px}
+.btn{background:var(--vw-blue);color:white;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:600}
+.btn.secondary{background:white;color:var(--vw-blue);border:1px solid rgba(0,30,80,0.08)}
+.container{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:calc(100vh - 120px);
+}
+.panel{width:900px;max-width:95%;}
+.card{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 8px 20px rgba(2,6,23,0.06)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:500}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8;background:#fbfdff;font-size:14px}
+.result-card{background:linear-gradient(90deg,#f0fff4,#e9ffe6);padding:14px;border-radius:12px;border:1px solid rgba(34,197,94,0.12);display:flex;flex-direction:column;gap:8px}
+.result-total{font-size:20px;font-weight:800;color:var(--vw-blue)}
+.result-sub{font-size:13px;color:#0b2540}
+.hidden{display:none}
+.menu{display:flex;gap:8px;margin-bottom:12px}
+.fade{transition:opacity .18s ease,transform .18s ease}
+@media(max-width:980px){ .panel{width:95%} .nav-actions{display:flex;flex-direction:column;gap:6px} }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">VW</div>
+  <div>
+    <div class="h-title">Cotizador Volkswagen — Pro</div>
+    <div style="font-size:12px;opacity:0.9">v4 · Panel central (900px)</div>
+  </div>
+  <div class="nav-actions">
+    <button class="btn" onclick="showScreen('cot')">Cotizador</button>
+    <button class="btn secondary" onclick="showScreen('lista')">Lista de Precios</button>
+    <button class="btn secondary" onclick="showScreen('promo')">Promociones</button>
+    <button class="btn secondary" onclick="showScreen('conf')">Config. Circular</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="panel">
+    <div class="card">
+      <div class="menu">
+        <button class="btn" onclick="showScreen('cot')">Cotizar</button>
+        <button class="btn secondary" onclick="showScreen('lista')">Lista</button>
+        <button class="btn secondary" onclick="showScreen('promo')">Promos</button>
+        <button class="btn secondary" onclick="showScreen('conf')">Circular</button>
+      </div>
+
+      <!-- Screens (same size panel) -->
+      <section id="cot" class="screen fade">
+        <h3>Cotizar</h3>
+        <div class="grid-2">
+          <div class="field"><label>Modelo</label><select id="selModelo"></select></div>
+          <div class="field"><label>Versión (versión - año)</label><select id="selVersion"></select></div>
+        </div>
+        <div class="grid-2" style="margin-top:8px">
+          <div class="field"><label>Precio Final</label><input id="inpPrecio" type="number" readonly></div>
+          <div class="field"><label>FAE</label><input id="inpFae" type="number" readonly></div>
+        </div>
+        <div class="grid-2" style="margin-top:8px">
+          <div class="field"><label>Monto a financiar</label><input id="inpMonto" type="number" placeholder="Ej: 15000000"></div>
+          <div class="field"><label>Campaña</label><select id="selCamp"></select></div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="field"><label>Provincia</label><select id="selProv"><option value="neuquen">Neuquén</option><option value="rionegro">Río Negro</option></select></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn" id="btn_calcular" onclick="calcular()">Calcular</button>
+          <button class="btn secondary" onclick="showScreen('promo')">Ir a Promociones</button>
+        </div>
+        <div id="cuotaHighlight" class="menu" style="margin-top:12px">Cuota estimada: <strong id="cuotaBig">-</strong></div>
+        <div id="out" class="result-card" style="margin-top:10px">
+          <div class="result-total" id="outTotal">ANTICIPO TOTAL: -</div>
+          <div class="result-sub" id="outDetails">Subtotales aparecerán aquí</div>
+        </div>
+      </section>
+
+      <section id="lista" class="screen fade hidden" style="margin-top:6px">
+        <h3>Lista de Precios</h3>
+        <table class="table" id="tablaLista"><thead><tr><th>Modelo</th><th>Versión</th><th>Año</th><th>FAE</th><th>Precio</th><th></th></tr></thead><tbody></tbody></table>
+        <h4 style="margin-top:8px">Agregar / Editar</h4>
+        <div class="grid-2"><div class="field"><label>Modelo</label><input id="lpModelo" placeholder="polo"></div><div class="field"><label>Versión</label><input id="lpVersion"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <div class="field"><label>Año</label><input id="lpAno"></div>
+          <div class="field"><label>FAE</label><input id="lpFae" type="number"></div>
+        </div>
+        <div class="field" style="margin-top:8px"><label>Precio Final</label><input id="lpPrecio" type="number"></div>
+        <div style="margin-top:8px"><button class="btn" onclick="agregarPrecio()">Agregar / Guardar</button></div>
+      </section>
+
+      <section id="promo" class="screen fade hidden" style="margin-top:6px">
+        <h3>Promociones</h3>
+        <div class="grid-2"><div class="field"><label>Precio promocional</label><input id="prPrecio" type="number"></div><div class="field"><label>Patentamiento (si tiene bonif.)</label><input id="prPatent" type="number"></div></div>
+        <div class="grid-2" style="margin-top:8px"><div class="field"><label>Provincia</label><select id="prProv"><option value="neuquen">Neuquén</option><option value="rionegro">Río Negro</option></select></div><div class="field"><label>Monto a financiar</label><input id="prMonto" type="number"></div></div>
+        <div style="margin-top:8px"><div class="field"><label>Campaña</label><select id="prCamp"></select></div></div>
+        <div style="margin-top:8px"><button class="btn" onclick="calcularPromo()">Calcular Promo</button></div>
+        <div id="outPromo" class="result-card" style="margin-top:10px"><div class="result-total" id="outPromoTotal">ANTICIPO TOTAL: -</div><div class="result-sub" id="outPromoDetails"></div></div>
+      </section>
+
+      <section id="conf" class="screen fade hidden" style="margin-top:6px">
+        <h3>Configuración de Circular</h3>
+        <div class="field"><label>Nombre</label><input id="cNombre"></div>
+        <div class="grid-2" style="margin-top:8px"><div class="field"><label>Cuota por 1000</label><input id="cCuota" type="number"></div><div class="field"><label>Máximo financiable</label><input id="cMax" type="number"></div></div>
+        <div class="grid-2" style="margin-top:8px"><div class="field"><label>% Quebranto (sin IVA)</label><input id="cQuebr" type="number"></div><div class="field"><label>Cantidad de cuotas</label><input id="cCuotas" type="number"></div></div>
+        <div class="field" style="margin-top:8px"><label>Modelos (coma)</label><input id="cModels" placeholder="polo,tera,..."></div>
+        <div style="margin-top:8px"><button class="btn" onclick="agregarCampania()">Cargar campaña</button></div>
+        <div style="margin-top:12px"><h4>Eliminar campaña</h4><select id="selCampDelete" style="width:100%;padding:8px;border-radius:8px"></select><div style="margin-top:8px"><button class="btn secondary" onclick="eliminarCampania()">Eliminar</button></div></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+let lista = [{"modelo": "polo", "version": "Msi Mt", "ano": "25", "fae": 2010000, "precioFinal": 41800000}, {"modelo": "polo", "version": "Comfortline 170tsi At", "ano": "25/26", "fae": 2010000, "precioFinal": 34800000}, {"modelo": "polo", "version": "Highline 170tsi At", "ano": "25/26", "fae": 2010000, "precioFinal": 39500000}, {"modelo": "polo", "version": "Gts 250tsi At", "ano": "25", "fae": 2010000, "precioFinal": 53300000}, {"modelo": "tera", "version": "Trend Msi Mt", "ano": "26", "fae": 2010000, "precioFinal": 32300000}, {"modelo": "tera", "version": "Comfort 170tsi At", "ano": "26", "fae": 2010000, "precioFinal": 37500000}, {"modelo": "tera", "version": "High 170tsi At", "ano": "26", "fae": 2010000, "precioFinal": 42800000}, {"modelo": "tera", "version": "Outfit 170tsi At", "ano": "26", "fae": 2010000, "precioFinal": 45200000}, {"modelo": "tera", "version": "Trend Msi Mt + Pack Safe I", "ano": "26", "fae": 2010000, "precioFinal": 37700000}, {"modelo": "tera", "version": "Comfort 170tsi At + Pack Safe Ii", "ano": "26", "fae": 2010000, "precioFinal": 42600000}, {"modelo": "virtus", "version": "Msi Mt", "ano": "26", "fae": 2074000, "precioFinal": 39350000}, {"modelo": "virtus", "version": "Trendline 170tsi At", "ano": "26", "fae": 2074000, "precioFinal": 42650000}, {"modelo": "virtus", "version": "Comfortline Msi Mt", "ano": "26", "fae": 2074000, "precioFinal": 45350000}, {"modelo": "virtus", "version": "Highline 170tsi At", "ano": "26", "fae": 2074000, "precioFinal": 46300000}, {"modelo": "virtus", "version": "Exclusive 250tsi At", "ano": "26", "fae": 2074000, "precioFinal": 51900000}, {"modelo": "nivus", "version": "170tsi Mt", "ano": "25/26", "fae": 2063000, "precioFinal": 36700000}, {"modelo": "nivus", "version": "Trendline 200tsi At", "ano": "25/26", "fae": 2063000, "precioFinal": 39800000}, {"modelo": "nivus", "version": "Comfortline 200tsi At", "ano": "25/26", "fae": 2063000, "precioFinal": 42800000}, {"modelo": "nivus", "version": "Highline 200tsi At", "ano": "25/26", "fae": 2063000, "precioFinal": 46500000}, {"modelo": "nivus", "version": "Outfit 200tsi At", "ano": "25/26", "fae": 2063000, "precioFinal": 48400000}, {"modelo": "t-cross", "version": "Trendline 170tsi Mt", "ano": "26", "fae": 2063000, "precioFinal": 40900000}, {"modelo": "t-cross", "version": "Trendline 200tsi At", "ano": "26", "fae": 2063000, "precioFinal": 43450000}, {"modelo": "t-cross", "version": "Comfortline 200tsi At", "ano": "26", "fae": 2063000, "precioFinal": 47100000}, {"modelo": "t-cross", "version": "Highline 200tsi At", "ano": "26", "fae": 2063000, "precioFinal": 51450000}, {"modelo": "t-cross", "version": "Extreme 200tsi At", "ano": "26", "fae": 2063000, "precioFinal": 53350000}, {"modelo": "taos", "version": "Comfortline 250tsi At", "ano": "24/25", "fae": 2562000, "precioFinal": 50500000}, {"modelo": "taos", "version": "Highline 250tsi At", "ano": "24/25", "fae": 2562000, "precioFinal": 58000000}, {"modelo": "taos", "version": "Highline Bi Tono 250tsi At", "ano": "24/25", "fae": 2562000, "precioFinal": 58400000}, {"modelo": "taos", "version": "Comfortline 250tsi At", "ano": "26", "fae": 2562000, "precioFinal": 56200000}, {"modelo": "taos", "version": "Highline 250tsi At", "ano": "26", "fae": 2562000, "precioFinal": 63600000}, {"modelo": "taos", "version": "Highline Bi Tono 250tsi At", "ano": "26", "fae": 2562000, "precioFinal": 65050000}, {"modelo": "vento", "version": "Gli 350tsi Dsg", "ano": "26", "fae": 2519500, "precioFinal": 74200000}, {"modelo": "tiguan", "version": "Life 250tsi Dsg", "ano": "25", "fae": 2698000, "precioFinal": 82100000}, {"modelo": "tiguan", "version": "R-line 250tsi Dsg", "ano": "25/26", "fae": 2698000, "precioFinal": 87150000}, {"modelo": "saveiro", "version": "Trendline Cs Msi Mt", "ano": "25/26", "fae": 2010000, "precioFinal": 34600000}, {"modelo": "saveiro", "version": "Comfortline Cd Msi Mt", "ano": "25/26", "fae": 2010000, "precioFinal": 36800000}, {"modelo": "saveiro", "version": "Extreme Cd Msi Mt", "ano": "25/26", "fae": 2010000, "precioFinal": 40400000}, {"modelo": "amarok", "version": "Trendline Tdi Mt 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 48650000}, {"modelo": "amarok", "version": "Trendline Tdi Mt 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 58900000}, {"modelo": "amarok", "version": "Comfortline Tdi Mt 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 57100000}, {"modelo": "amarok", "version": "Comfortline Tdi At 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 57800000}, {"modelo": "amarok", "version": "Highline Tdi Mt 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 61100000}, {"modelo": "amarok", "version": "Highline Tdi At 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 65350000}, {"modelo": "amarok", "version": "Comfortline V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 65850000}, {"modelo": "amarok", "version": "Highline V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 75600000}, {"modelo": "amarok", "version": "Extreme V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 80700000}, {"modelo": "amarok", "version": "Hero V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 82150000}, {"modelo": "amarok", "version": "Black Style V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 83600000}];
+let campanias = [{"nombre": "Especial Autos 0% 24M", "cuota1000": 41.67, "maxFin": 10000000, "quebranto": 6.5, "cuotas": 24, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Autos 0% 12M", "cuota1000": 83.33, "maxFin": 15000000, "quebranto": 5.9, "cuotas": 12, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Autos 0% 18M", "cuota1000": 55.56, "maxFin": 15000000, "quebranto": 11.84, "cuotas": 18, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Autos 9.9% 24M", "cuota1000": 47.83, "maxFin": 15000000, "quebranto": 12.5, "cuotas": 24, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Amarok 0% 12M", "cuota1000": 83.33, "maxFin": 20000000, "quebranto": 10, "cuotas": 12, "modelos": ["amarok"]}, {"nombre": "Especial Amarok 0% 18M", "cuota1000": 55.56, "maxFin": 15000000, "quebranto": 11.6, "cuotas": 18, "modelos": ["amarok"]}, {"nombre": "Especial Amarok 24.5% 24M", "cuota1000": 57.41, "maxFin": 24000000, "quebranto": 12, "cuotas": 24, "modelos": ["amarok"]}];
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){
+    s.classList.add('hidden');
+    s.style.opacity = 0;
+    s.style.transform = 'translateY(6px)';
+  });
+  var el = document.getElementById(id);
+  if(!el){ console.warn('screen not found',id); return; }
+  el.classList.remove('hidden');
+  setTimeout(function(){ el.style.opacity = 1; el.style.transform = 'translateY(0px)'; }, 10);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function actualizarUI(){
+  actualizarModelos();
+  actualizarCampanias();
+  renderTabla();
+  actualizarCampaniasPromo();
+}
+
+function actualizarModelos(){
+  var modelos = Array.from(new Set(lista.map(function(l){return l.modelo;})));
+  selModelo.innerHTML = modelos.map(function(m){ return '<option value="'+m+'">'+m.toUpperCase()+'</option>'; }).join('');
+  if(modelos.length) selModelo.dispatchEvent(new Event('change'));
+}
+
+selModelo.addEventListener('change', function(){
+  var mod = selModelo.value;
+  var versiones = lista.filter(function(l){ return l.modelo===mod; });
+  selVersion.innerHTML = versiones.map(function(v,i){ return '<option value="'+i+'">'+v.version+' - '+v.ano+'</option>'; }).join('');
+  if(versiones.length) selVersion.dispatchEvent(new Event('change'));
+});
+
+selVersion.addEventListener('change', function(){
+  var idx = parseInt(selVersion.value);
+  var mod = selModelo.value;
+  var versiones = lista.filter(function(l){ return l.modelo===mod; });
+  var d = versiones[idx];
+  if(d){
+    inpPrecio.value = d.precioFinal;
+    inpFae.value = d.fae;
+    actualizarCampanias();
+  } else {
+    inpPrecio.value=''; inpFae.value='';
+    selCamp.innerHTML='';
+  }
+});
+
+function actualizarCampanias(){
+  var mod = selModelo.value;
+  var filtradas = campanias.filter(function(c){ return c.modelos.indexOf(mod) !== -1; });
+  selCamp.innerHTML = filtradas.map(function(c,i){ return '<option value="'+i+'">'+c.nombre+'</option>'; }).join('');
+  selCampDelete.innerHTML = campanias.map(function(c,i){ return '<option value="'+i+'">'+c.nombre+'</option>'; }).join('');
+}
+
+function actualizarCampaniasPromo(){
+  prCamp.innerHTML = campanias.map(function(c,i){ return '<option value="'+i+'">'+c.nombre+'</option>'; }).join('');
+}
+
+function renderTabla(){
+  var tbody = document.querySelector('#tablaLista tbody');
+  tbody.innerHTML = lista.map(function(l,i){
+    return '<tr>'+
+      '<td style="width:90px">'+l.modelo+'</td>'+
+      '<td><input type="text" value="'+(l.version||'')+'" onchange="editVersion('+i+',this.value)"></td>'+
+      '<td style="width:70px"><input type="text" value="'+(l.ano||'')+'" onchange="editAno('+i+',this.value)"></td>'+
+      '<td style="width:110px"><input type="number" value="'+(l.fae||0)+'" onchange="editFAE('+i+',this.value)"></td>'+
+      '<td style="width:130px"><input type="number" value="'+(l.precioFinal||0)+'" onchange="editPrecio('+i+',this.value)"></td>'+
+      '<td style="width:70px" class="row-actions"><button onclick="delPrecio('+i+')">Eliminar</button></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function editVersion(i,val){ lista[i].version=val; actualizarUI(); }
+function editAno(i,val){ lista[i].ano=val; actualizarUI(); }
+function editFAE(i,val){ lista[i].fae=parseInt(val)||0; }
+function editPrecio(i,val){ lista[i].precioFinal=parseInt(val)||0; }
+function delPrecio(i){ if(confirm('Eliminar item?')){ lista.splice(i,1); actualizarUI(); } }
+
+function agregarPrecio(){
+  var modelo=lpModelo.value.trim().toLowerCase();
+  var version=lpVersion.value.trim();
+  var ano=lpAno.value.trim();
+  var fae=parseInt(lpFae.value)||0;
+  var precio=parseInt(lpPrecio.value)||0;
+  if(!modelo||!version||!ano||!precio){ alert('Completá modelo, versión, año y precio'); return; }
+  lista.push({modelo,version,ano,fae,precioFinal:precio});
+  lpModelo.value=lpVersion.value=lpAno.value=lpFae.value=lpPrecio.value='';
+  actualizarUI();
+}
+
+function agregarCampania(){
+  var nombre=cNombre.value.trim();
+  var cuota=parseFloat(cCuota.value);
+  var max=parseFloat(cMax.value);
+  var quebr=parseFloat(cQuebr.value);
+  var cuotas=parseInt(cCuotas.value);
+  var modelos=cModels.value.split(',').map(function(x){return x.trim().toLowerCase();});
+  if(!nombre||isNaN(cuota)||isNaN(max)||isNaN(quebr)||isNaN(cuotas)||modelos.length===0){alert('Completa todos los campos');return;}
+  campanias.push({nombre,cuota1000:cuota,maxFin:max,quebranto:quebr,cuotas,modelos});
+  actualizarUI();
+}
+
+function eliminarCampania(){
+  var idx=parseInt(selCampDelete.value);
+  if(isNaN(idx)){ alert('Seleccioná una campaña'); return; }
+  if(!confirm('Eliminar campaña?')) return;
+  campanias.splice(idx,1);
+  actualizarUI();
+}
+
+function calcular(){
+  var precio=parseFloat(inpPrecio.value) || 0;
+  var fae=parseFloat(inpFae.value) || 0;
+  var monto=parseFloat(inpMonto.value) || 0;
+  var prov = (typeof selProv !== 'undefined' && selProv) ? selProv.value : 'neuquen';
+  var campIdx=parseInt(selCamp.value);
+  if(isNaN(campIdx)){ alert('Seleccioná una campaña'); return; }
+  var camp=campanias[campIdx];
+
+  if(monto > camp.maxFin){
+    alert('El monto supera el máximo financiable para esta campaña ('+camp.maxFin.toLocaleString()+'). Corrigelo para continuar.');
+    outTotal.textContent = 'CORREGIR MONTO: supera máximo financiable.';
+    cuotaBig.textContent = '-';
+    return;
+  }
+
+  var cuotas=camp.cuotas;
+  var cuota = camp.cuota1000*(monto/1000);
+  var gestion=monto*0.02;
+  var prendaBase=cuota*cuotas;
+  var prenda=(prov==='neuquen')?prendaBase*0.025:prendaBase*0.03;
+  var patent=(prov==='neuquen')?(precio-fae)*0.045:(precio-fae)*0.055;
+
+  var x=monto*(camp.quebranto/100);
+  var util=(selModelo.value.includes('amarok')||selModelo.value.includes('saveiro'));
+  var y=x*(util?0.105:0.21);
+  var quebranto=x+y;
+
+  var gastosTotales=gestion+prenda+patent+quebranto;
+  var anticipo=(precio-monto)+gastosTotales;
+
+  cuotaBig.textContent = '$' + cuota.toFixed(2);
+  outTotal.textContent = 'ANTICIPO TOTAL: $' + anticipo.toLocaleString();
+  outDetails.innerHTML = '<div>Cuotas: ' + cuotas + '</div>' +
+                         '<div>Patentamiento: $' + patent.toLocaleString() + '</div>' +
+                         '<div>Gestión: $' + gestion.toLocaleString() + '</div>' +
+                         '<div>Prenda: $' + prenda.toLocaleString() + '</div>' +
+                         '<div>Quebranto: $' + quebranto.toLocaleString() + '</div>' +
+                         '<div><strong>Gastos Totales: $' + gastosTotales.toLocaleString() + '</strong></div>';
+}
+
+function calcularPromo(){
+  var precio=parseFloat(prPrecio.value) || 0;
+  var monto=parseFloat(prMonto.value) || 0;
+  var prov = (typeof prProv !== 'undefined' && prProv) ? prProv.value : 'neuquen';
+  var campIdx=parseInt(prCamp.value);
+  if(isNaN(campIdx)){ alert('Seleccioná una campaña'); return; }
+  var camp=campanias[campIdx];
+
+  if(monto > camp.maxFin){
+    alert('El monto supera el máximo financiable para esta campaña ('+camp.maxFin.toLocaleString()+'). Corrigelo para continuar.');
+    outPromoTotal.textContent = 'CORREGIR MONTO: supera máximo financiable.';
+    return;
+  }
+
+  var patentManual = parseFloat(prPatent.value);
+  var cuotas=camp.cuotas;
+  var cuota=camp.cuota1000*(monto/1000);
+  var gestion=monto*0.02;
+  var prenda=(prov==='neuquen')?(cuota*cuotas)*0.025:(cuota*cuotas)*0.03;
+  var patent = (!isNaN(patentManual) && patentManual>0) ? patentManual : ((prov==='neuquen')?precio*0.045:precio*0.055);
+
+  var x=monto*(camp.quebranto/100);
+  var util=false;
+  var y=x*(util?0.105:0.21);
+  var quebranto=x+y;
+
+  var gastos=gestion+prenda+patent+quebranto;
+  var anticipo=(precio-monto)+gastos;
+
+  outPromoTotal.textContent = 'ANTICIPO TOTAL: $' + anticipo.toLocaleString();
+  outPromoDetails.innerHTML = '<div>Cuotas: ' + cuotas + '</div>' +
+                              '<div>Patentamiento: $' + patent.toLocaleString() + '</div>' +
+                              '<div>Gastos Totales: $' + gastos.toLocaleString() + '</div>';
+}
+
+// init
+actualizarUI();
+showScreen('cot');
+</script>
+</body>
+</html>
