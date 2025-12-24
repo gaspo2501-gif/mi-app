@@ -127,6 +127,13 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8
         <div class="grid-2" style="margin-top:8px"><div class="field"><label>Provincia</label><select id="prProv"><option value="neuquen">Neuquén</option><option value="rionegro">Río Negro</option></select></div><div class="field"><label>Monto a financiar</label><input id="prMonto" type="number"></div></div>
         <div style="margin-top:8px"><div class="field"><label>Campaña</label><select id="prCamp"></select></div></div>
         <div style="margin-top:8px"><button class="btn" onclick="calcularPromo()">Calcular Promo</button></div>
+          <div id="promoCuota" class="menu" style="margin-top:12px">
+  Cuota estimada: <strong id="promoCuotaBig">-</strong>
+</div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+  <button class="btn secondary" onclick="generarPDFPromo()">Descargar PDF</button>
+  <button class="btn secondary" onclick="compartirPDFPromo()">Compartir cotización</button>
+</div>
         <div id="outPromo" class="result-card" style="margin-top:10px"><div class="result-total" id="outPromoTotal">ANTICIPO TOTAL: -</div><div class="result-sub" id="outPromoDetails"></div></div>
       </section>
 
@@ -318,6 +325,10 @@ function calcularPromo(){
   var patentManual = parseFloat(prPatent.value);
   var cuotas=camp.cuotas;
   var cuota=camp.cuota1000*(monto/1000);
+    promoCuotaBig.textContent = '$' + cuota.toLocaleString('es-AR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
   var gestion=monto*0.02;
   var prenda=(prov==='neuquen')?(cuota*cuotas)*0.025:(cuota*cuotas)*0.03;
   var patent = (!isNaN(patentManual) && patentManual>0) ? patentManual : ((prov==='neuquen')?precio*0.045:precio*0.055);
@@ -433,6 +444,53 @@ async function compartirPDF(){
   } else {
     // respaldo si el equipo no soporta compartir
     doc.save('Cotizacion_Iruna_VW.pdf');
+  }
+}
+    function generarPDFPromo(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 15;
+
+  doc.setFontSize(16);
+  doc.text('IRUÑA VOLKSWAGEN', 14, y); y+=8;
+  doc.setFontSize(11);
+  doc.text('Cotización – Promoción', 14, y); y+=10;
+
+  doc.text('Precio Promocional: $' + prPrecio.value.toLocaleString('es-AR'), 14, y); y+=6;
+  doc.text('Campaña: ' + prCamp.options[prCamp.selectedIndex].text, 14, y); y+=6;
+  doc.text('Cuota estimada: ' + promoCuotaBig.textContent, 14, y); y+=10;
+
+  doc.text(outPromoTotal.textContent, 14, y);
+
+  y+=10;
+  doc.setFontSize(9);
+  doc.text('Cotización sujeta a condiciones comerciales vigentes.', 14, y);
+
+  doc.save('Cotizacion_Promo_Iruna_VW.pdf');
+}
+
+async function compartirPDFPromo(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 15;
+
+  doc.setFontSize(16);
+  doc.text('IRUÑA VOLKSWAGEN', 14, y); y+=8;
+  doc.setFontSize(11);
+  doc.text('Cotización – Promoción', 14, y); y+=10;
+
+  doc.text('Precio Promocional: $' + prPrecio.value.toLocaleString('es-AR'), 14, y); y+=6;
+  doc.text('Cuota estimada: ' + promoCuotaBig.textContent, 14, y); y+=10;
+
+  doc.text(outPromoTotal.textContent, 14, y);
+
+  const blob = doc.output('blob');
+
+  if(navigator.share){
+    const file = new File([blob],'Cotizacion_Promo_Iruna_VW.pdf',{type:'application/pdf'});
+    await navigator.share({files:[file]});
+  } else {
+    doc.save('Cotizacion_Promo_Iruna_VW.pdf');
   }
 }
 </script>
