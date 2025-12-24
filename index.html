@@ -9,9 +9,7 @@
 
     <title>Mi App</title>
 </head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Cotizador VW Pro - v4 FIX</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--vw-blue:#001e50;--vw-celeste:#0099da;--bg:#f4f7fb;--card:#ffffff;--muted:#6b7280;--radius:12px}
@@ -126,17 +124,7 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8
         <div class="grid-2"><div class="field"><label>Precio promocional</label><input id="prPrecio" type="number"></div><div class="field"><label>Patentamiento (si tiene bonif.)</label><input id="prPatent" type="number"></div></div>
         <div class="grid-2" style="margin-top:8px"><div class="field"><label>Provincia</label><select id="prProv"><option value="neuquen">Neuquén</option><option value="rionegro">Río Negro</option></select></div><div class="field"><label>Monto a financiar</label><input id="prMonto" type="number"></div></div>
         <div style="margin-top:8px"><div class="field"><label>Campaña</label><select id="prCamp"></select></div></div>
-        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-  <button class="btn" onclick="calcularPromo()">Calcular Promo</button>
-
-  <button class="btn secondary" onclick="generarPDF()">
-    Descargar PDF
-  </button>
-
-  <button class="btn secondary" onclick="compartirPDF()">
-    Compartir cotización
-  </button>
-</div>
+        <div style="margin-top:8px"><button class="btn" onclick="calcularPromo()">Calcular Promo</button></div>
         <div id="outPromo" class="result-card" style="margin-top:10px"><div class="result-total" id="outPromoTotal">ANTICIPO TOTAL: -</div><div class="result-sub" id="outPromoDetails"></div></div>
       </section>
 
@@ -301,7 +289,7 @@ function calcular(){
   var gastosTotales=gestion+prenda+patent+quebranto;
   var anticipo=(precio-monto)+gastosTotales;
 
-  cuotaBig.textContent = formatoPesos(Math.round(cuota));
+  cuotaBig.textContent = '$' + cuota.toFixed(2);
   outTotal.textContent = 'ANTICIPO TOTAL: $' + anticipo.toLocaleString();
   outDetails.innerHTML = '<div>Cuotas: ' + cuotas + '</div>' +
                          '<div>Patentamiento: $' + patent.toLocaleString() + '</div>' +
@@ -341,14 +329,13 @@ function calcularPromo(){
   var anticipo=(precio-monto)+gastos;
 
   outPromoTotal.textContent = 'ANTICIPO TOTAL: $' + anticipo.toLocaleString();
-outPromoDetails.innerHTML =
+ outPromoDetails.innerHTML =
   '<div>Cuotas: ' + cuotas + '</div>' +
-  '<div>Valor de la cuota: ' + formatoPesos(Math.round(cuota)) + '</div>' +
-  '<div>Patentamiento: ' + formatoPesos(patent) + '</div>' +
-  '<div>Gestión: ' + formatoPesos(gestion) + '</div>' +
-  '<div>Prenda: ' + formatoPesos(prenda) + '</div>' +
-  '<div>Quebranto: ' + formatoPesos(quebranto) + '</div>' +
-  '<div><strong>Gastos Totales: ' + formatoPesos(gastos) + '</strong></div>';
+  '<div>Patentamiento: $' + patent.toLocaleString() + '</div>' +
+  '<div>Gestión: $' + gestion.toLocaleString() + '</div>' +
+  '<div>Prenda: $' + prenda.toLocaleString() + '</div>' +
+  '<div>Quebranto: $' + quebranto.toLocaleString() + '</div>' +
+  '<div><strong>Gastos Totales: $' + gastos.toLocaleString() + '</strong></div>';
 }
 
 // init
@@ -360,100 +347,35 @@ function generarPDF(){
 
   let y = 15;
 
-  // Encabezado
-  doc.setFontSize(18);
-  doc.setFont(undefined, 'bold');
-  doc.text('IRUÑA VOLKSWAGEN', 105, y, { align: 'center' });
+  doc.setFontSize(16);
+  doc.text('IRUÑA VOLKSWAGEN', 14, y);
   y += 8;
-
-  doc.setFontSize(12);
-  doc.setFont(undefined, 'normal');
-  doc.text('Cotización – Venta Directa', 105, y, { align: 'center' });
-  y += 6;
-
-  const fecha = new Date().toLocaleDateString('es-AR');
-  doc.setFontSize(9);
-  doc.text('Fecha: ' + fecha, 105, y, { align: 'center' });
-  y += 6;
-
-  doc.line(14, y, 196, y);
-  y += 8;
-
-  // VEHÍCULO
-  doc.setFontSize(12);
-  doc.setFont(undefined, 'bold');
-  doc.text('VEHÍCULO', 14, y);
-  y += 6;
 
   doc.setFontSize(11);
-  doc.setFont(undefined, 'normal');
-  doc.text('Modelo: ' + selModelo.value.toUpperCase(), 14, y); y += 6;
-  doc.text('Versión: ' + selVersion.options[selVersion.selectedIndex].text, 14, y); y += 6;
-  doc.text('Precio unidad: $' + Number(inpPrecio.value).toLocaleString(), 14, y);
-  y += 8;
+  doc.text('Cotización – Venta Directa', 14, y);
+  y += 10;
 
-  doc.line(14, y, 196, y);
-  y += 8;
-
-  // FINANCIACIÓN
-  doc.setFont(undefined, 'bold');
-  doc.text('FINANCIACIÓN', 14, y);
+  doc.text('Vehículo:', 14, y);
   y += 6;
-
-  doc.setFont(undefined, 'normal');
-  doc.text(
-    'Capital financiado: ' + formatoPesos(inpMonto.value)
-    18,
-    y
-  );
+  doc.text('Modelo: ' + selModelo.value.toUpperCase(), 14, y);
   y += 6;
+  doc.text('Versión: ' + selVersion.options[selVersion.selectedIndex].text, 14, y);
+  y += 10;
 
-  doc.text(
-    'Capital financiado: ' + formatoPesos(inpMonto.value)
-    18,
-    y
-  );
-  y += 8;
-
-  doc.line(14, y, 196, y);
-  y += 8;
-
-  // DETALLE DE GASTOS
-  doc.setFont(undefined, 'bold');
-  doc.text('DETALLE DE GASTOS', 14, y);
+  doc.text('Detalle de gastos:', 14, y);
   y += 6;
-
-  doc.setFont(undefined, 'normal');
   outDetails.innerText.split('\n').forEach(linea => {
     doc.text(linea, 18, y);
     y += 6;
   });
 
-  y += 4;
-  doc.line(14, y, 196, y);
-  y += 8;
-
-  // TOTAL
+  y += 6;
   doc.setFontSize(14);
-  doc.setFont(undefined, 'bold');
-  doc.text('ANTICIPO TOTAL', 14, y);
-  y += 8;
+  doc.text(outTotal.textContent, 14, y);
 
-  doc.setFontSize(18);
-  doc.text(outTotal.textContent.replace('ANTICIPO TOTAL: ', ''), 14, y);
-  y += 10;
-
-  doc.line(14, y, 196, y);
-  y += 8;
-
-  // Footer
+  y += 12;
   doc.setFontSize(9);
-  doc.setFont(undefined, 'normal');
-  doc.text(
-    'Cotización sujeta a condiciones comerciales vigentes. Valores estimados.',
-    14,
-    y
-  );
+  doc.text('Cotización sujeta a condiciones comerciales vigentes.', 14, y);
 
   doc.save('Cotizacion_Iruna_VW.pdf');
 }
@@ -514,3 +436,4 @@ async function compartirPDF(){
 </script>
 </body>
 </html>
+
