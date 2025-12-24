@@ -291,7 +291,7 @@ function calcular(){
   var gastosTotales=gestion+prenda+patent+quebranto;
   var anticipo=(precio-monto)+gastosTotales;
 
-  cuotaBig.textContent = '$' + cuota.toFixed(2);
+  cuotaBig.textContent = '$' + cuota.toLocaleString('es-AR', {   minimumFractionDigits: 2,   maximumFractionDigits: 2 });
   outTotal.textContent = 'ANTICIPO TOTAL: $' + anticipo.toLocaleString();
   outDetails.innerHTML = '<div>Cuotas: ' + cuotas + '</div>' +
                          '<div>Patentamiento: $' + patent.toLocaleString() + '</div>' +
