@@ -242,12 +242,35 @@ function renderTabla(){
   }).join('');
 }
 
-function editVersion(i,val){ lista[i].version=val; actualizarUI(); }
-function editAno(i,val){ lista[i].ano=val; actualizarUI(); }
-function editFAE(i,val){ lista[i].fae=parseInt(val)||0; }
-function editPrecio(i,val){ lista[i].precioFinal=parseInt(val)||0; }
-function delPrecio(i){ if(confirm('Eliminar item?')){ lista.splice(i,1); actualizarUI(); } }
+function editVersion(i,val){
+  lista[i].version = val;
+  guardarDatos();
+  actualizarUI();
+}
 
+function editAno(i,val){
+  lista[i].ano = val;
+  guardarDatos();
+  actualizarUI();
+}
+
+function editFAE(i,val){
+  lista[i].fae = parseInt(val) || 0;
+  guardarDatos();
+}
+
+function editPrecio(i,val){
+  lista[i].precioFinal = parseInt(val) || 0;
+  guardarDatos();
+}
+
+function delPrecio(i){
+  if(confirm('Eliminar item?')){
+    lista.splice(i,1);
+    guardarDatos();
+    actualizarUI();
+  }
+}
 function agregarPrecio(){
   var modelo=lpModelo.value.trim().toLowerCase();
   var version=lpVersion.value.trim();
@@ -257,6 +280,7 @@ function agregarPrecio(){
   if(!modelo||!version||!ano||!precio){ alert('Completá modelo, versión, año y precio'); return; }
   lista.push({modelo,version,ano,fae,precioFinal:precio});
   lpModelo.value=lpVersion.value=lpAno.value=lpFae.value=lpPrecio.value='';
+  guardarDatos();
   actualizarUI();
 }
 
@@ -269,6 +293,7 @@ function agregarCampania(){
   var modelos=cModels.value.split(',').map(function(x){return x.trim().toLowerCase();});
   if(!nombre||isNaN(cuota)||isNaN(max)||isNaN(quebr)||isNaN(cuotas)||modelos.length===0){alert('Completa todos los campos');return;}
   campanias.push({nombre,cuota1000:cuota,maxFin:max,quebranto:quebr,cuotas,modelos});
+    guardarDatos();
   actualizarUI();
 }
 
@@ -277,6 +302,7 @@ function eliminarCampania(){
   if(isNaN(idx)){ alert('Seleccioná una campaña'); return; }
   if(!confirm('Eliminar campaña?')) return;
   campanias.splice(idx,1);
+    guardarDatos();
   actualizarUI();
 }
 
