@@ -111,14 +111,18 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8
       <section id="lista" class="screen fade hidden" style="margin-top:6px">
         <h3>Lista de Precios</h3>
         <table class="table" id="tablaLista"><thead><tr><th>Modelo</th><th>Versión</th><th>Año</th><th>FAE</th><th>Precio</th><th></th></tr></thead><tbody></tbody></table>
-        <h4 style="margin-top:8px">Agregar / Editar</h4>
-        <div class="grid-2"><div class="field"><label>Modelo</label><input id="lpModelo" placeholder="polo"></div><div class="field"><label>Versión</label><input id="lpVersion"></div></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-          <div class="field"><label>Año</label><input id="lpAno"></div>
-          <div class="field"><label>FAE</label><input id="lpFae" type="number"></div>
-        </div>
-        <div class="field" style="margin-top:8px"><label>Precio Final</label><input id="lpPrecio" type="number"></div>
-        <div style="margin-top:8px"><button class="btn" onclick="agregarPrecio()">Agregar / Guardar</button></div>
+<!--
+<h4 style="margin-top:8px">Agregar / Editar</h4>
+<div class="grid-2"><div class="field"><label>Modelo</label><input id="lpModelo" placeholder="polo"></div><div class="field"><label>Versión</label><input id="lpVersion"></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+  <div class="field"><label>Año</label><input id="lpAno"></div>
+  <div class="field"><label>FAE</label><input id="lpFae" type="number"></div>
+  <div class="field"><label>Precio Final</label><input id="lpPrecio" type="number"></div>
+</div>
+<div style="margin-top:8px">
+  <button class="btn" onclick="agregarPrecio()">Agregar / Guardar</button>
+</div>
+-->
       </section>
 
       <section id="promo" class="screen fade hidden" style="margin-top:6px">
@@ -153,24 +157,51 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-    const STORAGE_KEY = 'cotizador_vw_pro_v4';
-const dataGuardada = JSON.parse(localStorage.getItem(STORAGE_KEY));
+   const SOLO_LECTURA = true;
 
-let lista = dataGuardada?.lista || [
-  {"modelo": "polo", "version": "Msi Mt", "ano": "25", "fae": 2010000, "precioFinal": 41800000}, {"modelo": "polo", "version": "Comfortline 170tsi At", "ano": "25/26", "fae": 2010000, "precioFinal": 34800000}, {"modelo": "polo", "version": "Highline 170tsi At", "ano": "25/26", "fae": 2010000, "precioFinal": 39500000}, {"modelo": "polo", "version": "Gts 250tsi At", "ano": "25", "fae": 2010000, "precioFinal": 53300000}, {"modelo": "tera", "version": "Trend Msi Mt", "ano": "26", "fae": 2010000, "precioFinal": 32300000}, {"modelo": "tera", "version": "Comfort 170tsi At", "ano": "26", "fae": 2010000, "precioFinal": 37500000}, {"modelo": "tera", "version": "High 170tsi At", "ano": "26", "fae": 2010000, "precioFinal": 42800000}, {"modelo": "tera", "version": "Outfit 170tsi At", "ano": "26", "fae": 2010000, "precioFinal": 45200000}, {"modelo": "tera", "version": "Trend Msi Mt + Pack Safe I", "ano": "26", "fae": 2010000, "precioFinal": 37700000}, {"modelo": "tera", "version": "Comfort 170tsi At + Pack Safe Ii", "ano": "26", "fae": 2010000, "precioFinal": 42600000}, {"modelo": "virtus", "version": "Msi Mt", "ano": "26", "fae": 2074000, "precioFinal": 39350000}, {"modelo": "virtus", "version": "Trendline 170tsi At", "ano": "26", "fae": 2074000, "precioFinal": 42650000}, {"modelo": "virtus", "version": "Comfortline Msi Mt", "ano": "26", "fae": 2074000, "precioFinal": 45350000}, {"modelo": "virtus", "version": "Highline 170tsi At", "ano": "26", "fae": 2074000, "precioFinal": 46300000}, {"modelo": "virtus", "version": "Exclusive 250tsi At", "ano": "26", "fae": 2074000, "precioFinal": 51900000}, {"modelo": "nivus", "version": "170tsi Mt", "ano": "25/26", "fae": 2063000, "precioFinal": 36700000}, {"modelo": "nivus", "version": "Trendline 200tsi At", "ano": "25/26", "fae": 2063000, "precioFinal": 39800000}, {"modelo": "nivus", "version": "Comfortline 200tsi At", "ano": "25/26", "fae": 2063000, "precioFinal": 42800000}, {"modelo": "nivus", "version": "Highline 200tsi At", "ano": "25/26", "fae": 2063000, "precioFinal": 46500000}, {"modelo": "nivus", "version": "Outfit 200tsi At", "ano": "25/26", "fae": 2063000, "precioFinal": 48400000}, {"modelo": "t-cross", "version": "Trendline 170tsi Mt", "ano": "26", "fae": 2063000, "precioFinal": 40900000}, {"modelo": "t-cross", "version": "Trendline 200tsi At", "ano": "26", "fae": 2063000, "precioFinal": 43450000}, {"modelo": "t-cross", "version": "Comfortline 200tsi At", "ano": "26", "fae": 2063000, "precioFinal": 47100000}, {"modelo": "t-cross", "version": "Highline 200tsi At", "ano": "26", "fae": 2063000, "precioFinal": 51450000}, {"modelo": "t-cross", "version": "Extreme 200tsi At", "ano": "26", "fae": 2063000, "precioFinal": 53350000}, {"modelo": "taos", "version": "Comfortline 250tsi At", "ano": "24/25", "fae": 2562000, "precioFinal": 50500000}, {"modelo": "taos", "version": "Highline 250tsi At", "ano": "24/25", "fae": 2562000, "precioFinal": 58000000}, {"modelo": "taos", "version": "Highline Bi Tono 250tsi At", "ano": "24/25", "fae": 2562000, "precioFinal": 58400000}, {"modelo": "taos", "version": "Comfortline 250tsi At", "ano": "26", "fae": 2562000, "precioFinal": 56200000}, {"modelo": "taos", "version": "Highline 250tsi At", "ano": "26", "fae": 2562000, "precioFinal": 63600000}, {"modelo": "taos", "version": "Highline Bi Tono 250tsi At", "ano": "26", "fae": 2562000, "precioFinal": 65050000}, {"modelo": "vento", "version": "Gli 350tsi Dsg", "ano": "26", "fae": 2519500, "precioFinal": 74200000}, {"modelo": "tiguan", "version": "Life 250tsi Dsg", "ano": "25", "fae": 2698000, "precioFinal": 82100000}, {"modelo": "tiguan", "version": "R-line 250tsi Dsg", "ano": "25/26", "fae": 2698000, "precioFinal": 87150000}, {"modelo": "saveiro", "version": "Trendline Cs Msi Mt", "ano": "25/26", "fae": 2010000, "precioFinal": 34600000}, {"modelo": "saveiro", "version": "Comfortline Cd Msi Mt", "ano": "25/26", "fae": 2010000, "precioFinal": 36800000}, {"modelo": "saveiro", "version": "Extreme Cd Msi Mt", "ano": "25/26", "fae": 2010000, "precioFinal": 40400000}, {"modelo": "amarok", "version": "Trendline Tdi Mt 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 48650000}, {"modelo": "amarok", "version": "Trendline Tdi Mt 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 58900000}, {"modelo": "amarok", "version": "Comfortline Tdi Mt 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 57100000}, {"modelo": "amarok", "version": "Comfortline Tdi At 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 57800000}, {"modelo": "amarok", "version": "Highline Tdi Mt 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 61100000}, {"modelo": "amarok", "version": "Highline Tdi At 4x2 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 65350000}, {"modelo": "amarok", "version": "Comfortline V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 65850000}, {"modelo": "amarok", "version": "Highline V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 75600000}, {"modelo": "amarok", "version": "Extreme V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 80700000}, {"modelo": "amarok", "version": "Hero V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 82150000}, {"modelo": "amarok", "version": "Black Style V6 At 4x4 G2", "ano": "25/26", "fae": 2671000, "precioFinal": 83600000}
-];
+let lista = [];
+let campanias = [];
 
-let campanias = dataGuardada?.campanias || [
- {"nombre": "Especial Autos 0% 24M", "cuota1000": 41.67, "maxFin": 10000000, "quebranto": 6.5, "cuotas": 24, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Autos 0% 12M", "cuota1000": 83.33, "maxFin": 15000000, "quebranto": 5.9, "cuotas": 12, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Autos 0% 18M", "cuota1000": 55.56, "maxFin": 15000000, "quebranto": 11.84, "cuotas": 18, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Autos 9.9% 24M", "cuota1000": 47.83, "maxFin": 15000000, "quebranto": 12.5, "cuotas": 24, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Amarok 0% 12M", "cuota1000": 83.33, "maxFin": 20000000, "quebranto": 10, "cuotas": 12, "modelos": ["amarok"]}, {"nombre": "Especial Amarok 0% 18M", "cuota1000": 55.56, "maxFin": 15000000, "quebranto": 11.6, "cuotas": 18, "modelos": ["amarok"]}, {"nombre": "Especial Amarok 24.5% 24M", "cuota1000": 57.41, "maxFin": 24000000, "quebranto": 12, "cuotas": 24, "modelos": ["amarok"]}
-];
-    function guardarDatos(){
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({ lista, campanias })
-  );
+const SHEET_ID = '2PACX-1vSmBwhwkvurUloSN80GzgshL0MHWyUS8ta_gfYb3c4v3lGA14klU_SFFPglG2VLEQ_gEIWM0758smuQ';
+const SHEET_PRECIOS = 'precios';
+const SHEET_CAMPANIAS = 'campanias';
+
+async function cargarDesdeSheet() {
+  try {
+    const base = `https://opensheet.elk.sh/${SHEET_ID}`;
+
+    const preciosRes = await fetch(`${base}/${SHEET_PRECIOS}`);
+    const campRes = await fetch(`${base}/${SHEET_CAMPANIAS}`);
+
+    const precios = await preciosRes.json();
+    const campaniasRaw = await campRes.json();
+
+    lista = precios.map(p => ({
+      modelo: p.modelo.toLowerCase(),
+      version: p.version,
+      ano: p.ano,
+      fae: Number(p.fae),
+      precioFinal: Number(p.precioFinal)
+    }));
+
+    campanias = campaniasRaw.map(c => ({
+      nombre: c.nombre,
+      cuota1000: Number(c.cuota1000),
+      maxFin: Number(c.maxFin),
+      quebranto: Number(c.quebranto),
+      cuotas: Number(c.cuotas),
+      modelos: c.modelos.split(',').map(m => m.trim())
+    }));
+
+    actualizarUI();
+
+  } catch (err) {
+    console.error('Error cargando datos desde Google Sheets', err);
+    alert('No se pudieron cargar precios/campañas desde la planilla');
+  }
 }
+
     function actualizarUI(){
-  guardarDatos();
   actualizarModelos();
   actualizarCampanias();
   renderTabla();
@@ -230,18 +261,17 @@ function actualizarCampaniasPromo(){
 
 function renderTabla(){
   var tbody = document.querySelector('#tablaLista tbody');
-  tbody.innerHTML = lista.map(function(l,i){
+  tbody.innerHTML = lista.map(function(l){
     return '<tr>'+
-      '<td style="width:90px">'+l.modelo+'</td>'+
-      '<td><input type="text" value="'+(l.version||'')+'" onchange="editVersion('+i+',this.value)"></td>'+
-      '<td style="width:70px"><input type="text" value="'+(l.ano||'')+'" onchange="editAno('+i+',this.value)"></td>'+
-      '<td style="width:110px"><input type="number" value="'+(l.fae||0)+'" onchange="editFAE('+i+',this.value)"></td>'+
-      '<td style="width:130px"><input type="number" value="'+(l.precioFinal||0)+'" onchange="editPrecio('+i+',this.value)"></td>'+
-      '<td style="width:70px" class="row-actions"><button onclick="delPrecio('+i+')">Eliminar</button></td>'+
+      '<td>'+l.modelo+'</td>'+
+      '<td>'+l.version+'</td>'+
+      '<td>'+l.ano+'</td>'+
+      '<td>$'+l.fae.toLocaleString()+'</td>'+
+      '<td>$'+l.precioFinal.toLocaleString()+'</td>'+
+      '<td style="color:#999">Bloqueado</td>'+
     '</tr>';
   }).join('');
 }
-
 function editVersion(i,val){
   lista[i].version = val;
   guardarDatos();
@@ -391,7 +421,7 @@ function calcularPromo(){
 }
 
 // init
-actualizarUI();
+cargarDesdeSheet();
 showScreen('cot');
 function generarPDF(){
   const { jsPDF } = window.jspdf;
