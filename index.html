@@ -163,6 +163,12 @@ let lista = dataGuardada?.lista || [
 let campanias = dataGuardada?.campanias || [
  {"nombre": "Especial Autos 0% 24M", "cuota1000": 41.67, "maxFin": 10000000, "quebranto": 6.5, "cuotas": 24, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Autos 0% 12M", "cuota1000": 83.33, "maxFin": 15000000, "quebranto": 5.9, "cuotas": 12, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Autos 0% 18M", "cuota1000": 55.56, "maxFin": 15000000, "quebranto": 11.84, "cuotas": 18, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Autos 9.9% 24M", "cuota1000": 47.83, "maxFin": 15000000, "quebranto": 12.5, "cuotas": 24, "modelos": ["polo", "tera", "nivus", "t-cross", "virtus", "taos", "vento", "tiguan", "saveiro"]}, {"nombre": "Especial Amarok 0% 12M", "cuota1000": 83.33, "maxFin": 20000000, "quebranto": 10, "cuotas": 12, "modelos": ["amarok"]}, {"nombre": "Especial Amarok 0% 18M", "cuota1000": 55.56, "maxFin": 15000000, "quebranto": 11.6, "cuotas": 18, "modelos": ["amarok"]}, {"nombre": "Especial Amarok 24.5% 24M", "cuota1000": 57.41, "maxFin": 24000000, "quebranto": 12, "cuotas": 24, "modelos": ["amarok"]}
 ];
+    function guardarDatos(){
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({ lista, campanias })
+  );
+}
     function actualizarUI(){
   guardarDatos();
   actualizarModelos();
@@ -181,13 +187,6 @@ let campanias = dataGuardada?.campanias || [
   el.classList.remove('hidden');
   setTimeout(function(){ el.style.opacity = 1; el.style.transform = 'translateY(0px)'; }, 10);
   window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function actualizarUI(){
-  actualizarModelos();
-  actualizarCampanias();
-  renderTabla();
-  actualizarCampaniasPromo();
 }
 
 function actualizarModelos(){
@@ -367,7 +366,6 @@ function calcularPromo(){
 
 // init
 actualizarUI();
-guardarDatos();
 showScreen('cot');
 function generarPDF(){
   const { jsPDF } = window.jspdf;
