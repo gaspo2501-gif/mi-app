@@ -51,23 +51,16 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8
     <div style="font-size:12px;opacity:0.9">v4 · Panel central (900px)</div>
   </div>
   <div class="nav-actions">
-    <!-- <button class="btn secondary" onclick="showScreen('conf')">Config. Circular</button> -->
-    <button class="btn secondary" onclick="showScreen('lista')">Lista de Precios</button>
-    <button class="btn secondary" onclick="showScreen('promo')">Promociones</button>
-    <!-- <button class="btn secondary" onclick="showScreen('conf')">Circular</button> -->
-  </div>
+  <button class="btn" onclick="showScreen('cot')">Cotizador</button>
+  <button class="btn secondary" onclick="showScreen('lista')">Lista de precios</button>
+  <button class="btn secondary" onclick="showScreen('promo')">Promociones</button>
+</div>
 </div>
 
 <div class="container">
   <div class="panel">
     <div class="card">
-      <div class="menu">
-        <button class="btn" onclick="showScreen('cot')">Cotizar</button>
-        <button class="btn secondary" onclick="showScreen('lista')">Lista</button>
-        <button class="btn secondary" onclick="showScreen('promo')">Promos</button>
-        <button class="btn secondary" onclick="showScreen('conf')">Circular</button>
-      </div>
-
+        
       <!-- Screens (same size panel) -->
       <section id="cot" class="screen fade">
         <h3>Cotizar</h3>
@@ -139,16 +132,6 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8
   <button class="btn secondary" onclick="compartirPDFPromo()">Compartir cotización</button>
 </div>
         <div id="outPromo" class="result-card" style="margin-top:10px"><div class="result-total" id="outPromoTotal">ANTICIPO TOTAL: -</div><div class="result-sub" id="outPromoDetails"></div></div>
-      </section>
-
-      <section id="conf" class="screen fade hidden" style="margin-top:6px">
-        <h3>Configuración de Circular</h3>
-        <div class="field"><label>Nombre</label><input id="cNombre"></div>
-        <div class="grid-2" style="margin-top:8px"><div class="field"><label>Cuota por 1000</label><input id="cCuota" type="number"></div><div class="field"><label>Máximo financiable</label><input id="cMax" type="number"></div></div>
-        <div class="grid-2" style="margin-top:8px"><div class="field"><label>% Quebranto (sin IVA)</label><input id="cQuebr" type="number"></div><div class="field"><label>Cantidad de cuotas</label><input id="cCuotas" type="number"></div></div>
-        <div class="field" style="margin-top:8px"><label>Modelos (coma)</label><input id="cModels" placeholder="polo,tera,..."></div>
-        <div style="margin-top:8px"><button class="btn" onclick="agregarCampania()">Cargar campaña</button></div>
-        <div style="margin-top:12px"><h4>Eliminar campaña</h4><select id="selCampDelete" style="width:100%;padding:8px;border-radius:8px"></select><div style="margin-top:8px"><button class="btn secondary" onclick="eliminarCampania()">Eliminar</button></div></div>
       </section>
 
     </div>
