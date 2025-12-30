@@ -235,7 +235,6 @@ function actualizarCampanias(){
   var mod = selModelo.value;
   var filtradas = campanias.filter(function(c){ return c.modelos.indexOf(mod) !== -1; });
   selCamp.innerHTML = filtradas.map(function(c,i){ return '<option value="'+i+'">'+c.nombre+'</option>'; }).join('');
-  selCampDelete.innerHTML = campanias.map(function(c,i){ return '<option value="'+i+'">'+c.nombre+'</option>'; }).join('');
 }
 
 function actualizarCampaniasPromo(){
