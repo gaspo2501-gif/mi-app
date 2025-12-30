@@ -73,7 +73,7 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8
           <div class="field"><label>FAE</label><input id="inpFae" type="number" readonly></div>
         </div>
         <div class="grid-2" style="margin-top:8px">
-          <div class="field"><label>Monto a financiar</label><input id="inpMonto" type="number" placeholder="Ej: 15000000"></div>
+          <div class="field"><label>Monto a financiar</label><input id="inpMonto" type="text" placeholder="Ej: 15.000.000"></div>
           <div class="field"><label>Campaña</label><select id="selCamp"></select></div>
         </div>
         <div style="margin-top:8px">
@@ -120,8 +120,8 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8
 
       <section id="promo" class="screen fade hidden" style="margin-top:6px">
         <h3>Promociones</h3>
-        <div class="grid-2"><div class="field"><label>Precio promocional</label><input id="prPrecio" type="number"></div><div class="field"><label>Patentamiento (si tiene bonif.)</label><input id="prPatent" type="number"></div></div>
-        <div class="grid-2" style="margin-top:8px"><div class="field"><label>Provincia</label><select id="prProv"><option value="neuquen">Neuquén</option><option value="rionegro">Río Negro</option></select></div><div class="field"><label>Monto a financiar</label><input id="prMonto" type="number"></div></div>
+        <div class="grid-2"><div class="field"><label>Precio promocional</label><input id="prPrecio" type="text"></div><div class="field"><label>Patentamiento (si tiene bonif.)</label><input id="prPatent" type="text"></div></div>
+        <div class="grid-2" style="margin-top:8px"><div class="field"><label>Provincia</label><select id="prProv"><option value="neuquen">Neuquén</option><option value="rionegro">Río Negro</option></select></div><div class="field"><label>Monto a financiar</label><input id="prMonto" type="text"></div></div>
         <div style="margin-top:8px"><div class="field"><label>Campaña</label><select id="prCamp"></select></div></div>
         <div style="margin-top:8px"><button class="btn" onclick="calcularPromo()">Calcular Promo</button></div>
           <div id="promoCuota" class="menu" style="margin-top:12px">
@@ -148,6 +148,23 @@ let campanias = [];
 const SHEET_ID = '1e16MGd26-RQIVtbiUJzROex43vj9DXCPqpz_ez2Oo60';
 const SHEET_PRECIOS = 'precios';
 const SHEET_CAMPANIAS = 'campanias';
+
+    function soloNumeros(valor) {
+  return valor.replace(/\D/g, '');
+}
+
+function formatearMiles(valor) {
+  if (!valor) return '';
+  return Number(valor).toLocaleString('es-AR');
+}
+
+function bindFormatoMiles(input) {
+  if (!input) return;
+  input.addEventListener('input', function () {
+    const limpio = soloNumeros(this.value);
+    this.value = formatearMiles(limpio);
+  });
+}
 
 async function cargarDesdeSheet() {
   try {
@@ -321,7 +338,7 @@ function eliminarCampania(){
 function calcular(){
   var precio=parseFloat(inpPrecio.value) || 0;
   var fae=parseFloat(inpFae.value) || 0;
-  var monto=parseFloat(inpMonto.value) || 0;
+  var monto = Number(inpMonto.value.replace(/\./g, '')) || 0;
   var prov = (typeof selProv !== 'undefined' && selProv) ? selProv.value : 'neuquen';
   var campIdx=parseInt(selCamp.value);
   if(isNaN(campIdx)){ alert('Seleccioná una campaña'); return; }
@@ -360,8 +377,8 @@ function calcular(){
 }
 
 function calcularPromo(){
-  var precio=parseFloat(prPrecio.value) || 0;
-  var monto=parseFloat(prMonto.value) || 0;
+  var precio = Number(prPrecio.value.replace(/\./g, '')) || 0;
+  var monto = Number(prMonto.value.replace(/\./g, '')) || 0;
   var prov = (typeof prProv !== 'undefined' && prProv) ? prProv.value : 'neuquen';
   var campIdx=parseInt(prCamp.value);
   if(isNaN(campIdx)){ alert('Seleccioná una campaña'); return; }
@@ -373,7 +390,7 @@ function calcularPromo(){
     return;
   }
 
-  var patentManual = parseFloat(prPatent.value);
+  var patentManual = Number(prPatent.value.replace(/\./g, ''));
   var cuotas=camp.cuotas;
   var cuota=camp.cuota1000*(monto/1000);
     promoCuotaBig.textContent = '$' + cuota.toLocaleString('es-AR', {
@@ -405,6 +422,10 @@ function calcularPromo(){
 // init
 cargarDesdeSheet();
 showScreen('cot');
+    bindFormatoMiles(inpMonto);
+bindFormatoMiles(prMonto);
+bindFormatoMiles(prPrecio);
+bindFormatoMiles(prPatent);
 function generarPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
