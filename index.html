@@ -429,34 +429,69 @@ function generarPDF(){
 
   let y = 15;
 
+  // Encabezado
   doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
   doc.text('IRUÑA VOLKSWAGEN', 14, y);
-  y += 8;
+  y += 6;
 
   doc.setFontSize(11);
+  doc.setFont(undefined, 'normal');
   doc.text('Cotización – Venta Directa', 14, y);
-  y += 10;
+  y += 8;
 
-  doc.text('Vehículo:', 14, y);
-  y += 6;
-  doc.text('Modelo: ' + selModelo.value.toUpperCase(), 14, y);
-  y += 6;
-  doc.text('Versión: ' + selVersion.options[selVersion.selectedIndex].text, 14, y);
-  y += 10;
+  doc.line(14, y, 196, y);
+  y += 8;
 
-  doc.text('Detalle de gastos:', 14, y);
+  // Vehículo
+  doc.setFont(undefined, 'bold');
+  doc.text('Vehículo', 14, y);
   y += 6;
-  outDetails.innerText.split('\n').forEach(linea => {
-    doc.text(linea, 18, y);
-    y += 6;
+
+  doc.setFont(undefined, 'normal');
+  doc.text(`Marca: Volkswagen`, 14, y); y+=5;
+  doc.text(`Modelo: ${selModelo.value.toUpperCase()}`, 14, y); y+=5;
+  doc.text(`Versión: ${selVersion.options[selVersion.selectedIndex].text}`, 14, y);
+  y += 8;
+
+  // Financiación
+  const camp = campanias[parseInt(selCamp.value)];
+  const monto = Number(inpMonto.value);
+  const cuota = camp.cuota1000 * (monto / 1000);
+
+  doc.setFont(undefined, 'bold');
+  doc.text('Financiación', 14, y);
+  y += 6;
+
+  doc.setFont(undefined, 'normal');
+  doc.text(`Monto a financiar: $${monto.toLocaleString()}`, 14, y); y+=5;
+  doc.text(`Cantidad de cuotas: ${camp.cuotas}`, 14, y); y+=5;
+  doc.text(`Valor cuota estimada: $${cuota.toLocaleString('es-AR',{minimumFractionDigits:2})}`, 14, y);
+  y += 8;
+
+  // Detalle de gastos
+  doc.setFont(undefined, 'bold');
+  doc.text('Detalle de gastos', 14, y);
+  y += 6;
+
+  doc.setFont(undefined, 'normal');
+  outDetails.innerText.split('\n').forEach(linea=>{
+    doc.text(linea, 14, y);
+    y+=5;
   });
 
-  y += 6;
+  y += 4;
+  doc.line(14, y, 196, y);
+  y += 8;
+
+  // Resultado final
   doc.setFontSize(14);
+  doc.setFont(undefined, 'bold');
   doc.text(outTotal.textContent, 14, y);
 
   y += 12;
   doc.setFontSize(9);
+  doc.setFont(undefined, 'normal');
   doc.text('Cotización sujeta a condiciones comerciales vigentes.', 14, y);
 
   doc.save('Cotizacion_Iruna_VW.pdf');
@@ -518,48 +553,73 @@ async function compartirPDF(){
     function generarPDFPromo(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+
   let y = 15;
 
+  // Encabezado
   doc.setFontSize(16);
-  doc.text('IRUÑA VOLKSWAGEN', 14, y); y+=8;
+  doc.setFont(undefined, 'bold');
+  doc.text('IRUÑA VOLKSWAGEN', 14, y);
+  y += 6;
+
   doc.setFontSize(11);
-  doc.text('Cotización – Promoción', 14, y); y+=10;
+  doc.setFont(undefined, 'normal');
+  doc.text('Cotización – Promoción Especial', 14, y);
+  y += 8;
 
-  doc.text('Precio Promocional: $' + prPrecio.value.toLocaleString('es-AR'), 14, y); y+=6;
-  doc.text('Campaña: ' + prCamp.options[prCamp.selectedIndex].text, 14, y); y+=6;
-  doc.text('Cuota estimada: ' + promoCuotaBig.textContent, 14, y); y+=10;
+  doc.line(14, y, 196, y);
+  y += 8;
 
+  // Promo
+  doc.setFont(undefined, 'bold');
+  doc.text('Vehículo / Promoción', 14, y);
+  y += 6;
+
+  doc.setFont(undefined, 'normal');
+  doc.text(`Precio promocional: $${Number(prPrecio.value).toLocaleString()}`, 14, y); y+=5;
+  doc.text(`Campaña: ${prCamp.options[prCamp.selectedIndex].text}`, 14, y);
+  y += 8;
+
+  // Financiación
+  const camp = campanias[parseInt(prCamp.value)];
+  const monto = Number(prMonto.value);
+  const cuota = camp.cuota1000 * (monto / 1000);
+
+  doc.setFont(undefined, 'bold');
+  doc.text('Financiación', 14, y);
+  y += 6;
+
+  doc.setFont(undefined, 'normal');
+  doc.text(`Monto a financiar: $${monto.toLocaleString()}`, 14, y); y+=5;
+  doc.text(`Cantidad de cuotas: ${camp.cuotas}`, 14, y); y+=5;
+  doc.text(`Valor cuota estimada: $${cuota.toLocaleString('es-AR',{minimumFractionDigits:2})}`, 14, y);
+  y += 8;
+
+  // Detalle de gastos
+  doc.setFont(undefined, 'bold');
+  doc.text('Detalle de gastos', 14, y);
+  y += 6;
+
+  outPromoDetails.innerText.split('\n').forEach(linea=>{
+    doc.text(linea, 14, y);
+    y+=5;
+  });
+
+  y += 4;
+  doc.line(14, y, 196, y);
+  y += 8;
+
+  // Resultado final
+  doc.setFontSize(14);
+  doc.setFont(undefined, 'bold');
   doc.text(outPromoTotal.textContent, 14, y);
 
-  y+=10;
+  y += 12;
   doc.setFontSize(9);
+  doc.setFont(undefined, 'normal');
   doc.text('Cotización sujeta a condiciones comerciales vigentes.', 14, y);
 
   doc.save('Cotizacion_Promo_Iruna_VW.pdf');
-}
-
-async function compartirPDFPromo(){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  let y = 15;
-
-  doc.setFontSize(16);
-  doc.text('IRUÑA VOLKSWAGEN', 14, y); y+=8;
-  doc.setFontSize(11);
-  doc.text('Cotización – Promoción', 14, y); y+=10;
-
-  doc.text('Precio Promocional: $' + prPrecio.value.toLocaleString('es-AR'), 14, y); y+=6;
-  doc.text('Cuota estimada: ' + promoCuotaBig.textContent, 14, y); y+=10;
-
-  doc.text(outPromoTotal.textContent, 14, y);
-
-  const blob = doc.output('blob');
-
-  if(navigator.share){
-    const file = new File([blob],'Cotizacion_Promo_Iruna_VW.pdf',{type:'application/pdf'});
-    await navigator.share({files:[file]});
-  } else {
-    doc.save('Cotizacion_Promo_Iruna_VW.pdf');
   }
 }
 </script>
